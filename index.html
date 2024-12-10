@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs - User Actions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #log-container {
+            width: 80%;
+            margin: auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn {
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .ban-btn { background-color: red; color: white; }
+        .timeout-btn { background-color: orange; color: white; }
+        .report-btn { background-color: blue; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Admin Logs</h1>
+    <div id="log-container">
+        <h3>Recent Bans, Timeouts, and Reports</h3>
+        <table id="logs-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                    <th>Admin Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Logs will be populated here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Simulating data from localStorage for banned users and logs
+        const bannedUsers = JSON.parse(localStorage.getItem('bannedUsers')) || [];
+        const loggedOutAdmins = JSON.parse(localStorage.getItem('loggedOutAdmins')) || [];
+
+        // Populate logs with banned users, timeouts, and reports
+        function populateLogs() {
+            const logsTable = document.getElementById('logs-table').getElementsByTagName('tbody')[0];
+
+            // Combine all logs for banned users and admin logouts
+            const allLogs = [...bannedUsers, ...loggedOutAdmins];
+
+            // Limit to 15 logs
+            const limitedLogs = allLogs.slice(0, 15);
+
+            limitedLogs.forEach(log => {
+                const row = logsTable.insertRow();
+                const usernameCell = row.insertCell(0);
+                const actionCell = row.insertCell(1);
+                const timestampCell = row.insertCell(2);
+                const adminActionCell = row.insertCell(3);
+
+                usernameCell.textContent = log.username;
+                timestampCell.textContent = log.timestamp;
+
+                // If the log is for banning, show ban button
+                if (bannedUsers.includes(log)) {
+                    actionCell.textContent = "Banned";
+                    const banButton = document.createElement('button');
+                    banButton.textContent = 'Ban User';
+                    banButton.classList.add('btn', 'ban-btn');
+                    adminActionCell.appendChild(banButton);
+                    banButton.onclick = () => banUser(log.username);
+                } 
+                // If the log is for admin logout, show timeout button
+                else if (loggedOutAdmins.includes(log)) {
+                    actionCell.textContent = "Logged Out Admin";
+                    const timeoutButton = document.createElement('button');
+                    timeoutButton.textContent = 'Timeout';
+                    timeoutButton.classList.add('btn', 'timeout-btn');
+                    adminActionCell.appendChild(timeoutButton);
+                    timeoutButton.onclick = () => timeoutUser(log.username);
+                }
+
+                // Add report button for each log
+                const reportButton = document.createElement('button');
+                reportButton.textContent = 'Report';
+                reportButton.classList.add('btn', 'report-btn');
+                adminActionCell.appendChild(reportButton);
+                reportButton.onclick = () => reportUser(log.username);
+            });
+        }
+
+        // Ban user function
+        function banUser(username) {
+            alert(`${username} has been banned again.`);
+            // Implement your banning logic here
+        }
+
+        // Timeout user function
+        function timeoutUser(username) {
+            alert(`${username} has been timed out.`);
+            // Implement your timeout logic here
+        }
+
+        // Report user function
+        function reportUser(username) {
+            alert(`${username} has been reported.`);
+            // Implement your report handling logic here
+        }
+
+        // Call populateLogs on page load
+        window.onload = populateLogs;
+    </script>
+</body>
+</html>
